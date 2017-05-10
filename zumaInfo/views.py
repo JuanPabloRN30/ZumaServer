@@ -51,7 +51,7 @@ def user_detail(request, pk):
 def categoria_detail(request, nombre):
     try:
         categoria = Categoria.objects.get(nombre=nombre)
-    except Intereses.DoesNotExist:
+    except Categoria.DoesNotExist:
         return HttpResponse(status=404)
 
     if request.method == 'GET':
@@ -155,9 +155,11 @@ class ClienteList(APIView):
                         username = serializer.data['username'],     \
                         email = serializer.data['email'])
             user.set_password(serializer.data['password'])
-            #user.save()
+            user.save()
             cliente = Cliente(user = user)
-            #cliente.save()
+            cliente.save()
+            for item in serializer.data[ 'intereses' ]:
+                cliente.intereses.add( Interes.objects.get(nombre=item['nombre']) )
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 

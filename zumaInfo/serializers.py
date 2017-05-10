@@ -37,9 +37,10 @@ class ClienteSerializer(serializers.HyperlinkedModelSerializer):
     password = serializers.CharField( source='user.password',required = False )
     email = serializers.CharField( source='user.email',required = False )
     first_name = serializers.CharField( source='user.first_name',required = False )
+    intereses = InteresSerializer(many = True)
     class Meta:
         model = Cliente
-        fields = ('username','password','email','first_name')#, 'photo')
+        fields = ('username','password','email','first_name','intereses')#, 'photo')
 
 class SolicitudSerializer(serializers.ModelSerializer):
     id_trabajador = serializers.CharField( source='trabajador.id' )
