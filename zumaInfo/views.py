@@ -165,14 +165,13 @@ class ClienteList(APIView):
 
 @api_view(['GET'])
 def get_trabajador_authenticated(request):
-    print ('Al menos entre aca')
     try:
         user = request.user
-        print ("Entro el trabajador: " + user.username)
         trabajador = Trabajador.objects.filter(user__id__exact=user.id).first()
-        logger.info('getting auth data for trabajador ' + trabajador.user.username)
+        if trabajador is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
     except Trabajador.DoesNotExist:
-        print ("Entre al error")
+
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     serializer = TrabajadorSerializer(trabajador)
@@ -182,12 +181,78 @@ def get_trabajador_authenticated(request):
 def get_cliente_authenticated(request):
     try:
         user = request.user
-        print ("Entro el cliente: " + user.username)
         cliente = Cliente.objects.filter(user__id__exact=user.id).first()
-        logger.info('getting auth data for cliente ' + cliente.user.username)
+        if cliente is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
     except Cliente.DoesNotExist:
-        print ("Entre al error")
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     serializer = ClienteSerializer(cliente)
     return Response(serializer.data)
+
+@api_view(['GET'])
+def solicitud_cliente(request):
+    user = request.user
+    print (user)
+    cliente = Cliente.objects.filter(user__id__exact = user.id).first()
+    solicitudes = Solicitud.objects.filter(cliente = cliente).all()
+    mis_solicitudes = []
+    for solicitud in solicitudes:
+        # setting the worker to the work
+        if solicitud.trabajador is not None:
+            trabajador = Trabajador.objects.get(pk = solicitud.trabajador.id)
+            solicitud.trabajador = trabajador
+        mis_solicitudes.append(solicitud)
+    serializer = SolicitudSerializer(mis_solicitudes, many = True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def solicitud_trabajador(request):
+    user = request.user
+    print (user)
+    trabajador = Trabajador.objects.filter(user__id__exact = user.id).first()
+    solicitudes = Solicitud.objects.filter(trabajador = trabajador).all()
+    mis_solicitudes = []
+    for solicitud in solicitudes:
+        mis_solicitudes.append(solicitud)
+    serializer = SolicitudSerializer(mis_solicitudes, many = True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def solicitud_trabajador_interes(request,nombre):
+    print ("El nombre del interes es: " + nombre)
+    interes = Interes.objects.get( nombre = nombre )
+    trabajadores = Trabajador.objects.filter(intereses = interes).all()
+    mis_trabajadores = []
+    for trabajador in trabajadores:
+        mis_trabajadores.append(trabajador)
+    serializer = TrabajadorSerializer(mis_trabajadores, many = True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def create_solicitud(request):
+    serializer = SolicitudDTOSerializer(data = request.data)
+    if request.method == 'GET':
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+    try:
+        if serializer.is_valid():
+            trabajador_usuario = User.objects.filter(username = serializer.data['trabajadorusername']).first()
+            trabajador = Trabajador.objects.filter(user__id__exact = trabajador_usuario.id).first()
+            interes = Interes.objects.filter(nombre = serializer.data['interesnombre']).first()
+            fecha = serializer.data['fecha']
+            direccion = serializer.data['direccion']
+            descripcion = serializer.data['descripcion']
+            user = request.user
+            cliente = Cliente.objects.filter(user__id__exact = user.id).first()
+            solicitud = Solicitud(fecha = fecha, direccion = direccion,
+                        descripcion = descripcion, cliente = cliente,
+                        trabajador = trabajador, interes = interes)
+            solicitud.save()
+            serializer = SolicitudSerializer(solicitud)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        else:
+            return Response(status = status.HTTP_400_BAD_REQUEST)
+    except Interes.DoesNotExist:
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+    except Trabajador.DoesNotExist:
+        return Response(status = status.HTTP_400_BAD_REQUEST)

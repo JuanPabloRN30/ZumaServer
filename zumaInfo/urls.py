@@ -17,7 +17,14 @@ urlpatterns = [
     url(r'^api/token-auth/', rest_views.obtain_auth_token),
     url(r'^api/', include(router.urls)),
 
-    url(r'^user/(?P<pk>[0-9]+)/$', views.user_detail),
-    url(r'^categoria/(?P<nombre>[\w\-]+)/$', views.categoria_detail),
-    url(r'^interes/(?P<nombre>[\w\-]+)/$', views.interes_detail),
+    url(r'^api/user/(?P<pk>[0-9]+)/$', views.user_detail),
+    url(r'^api/categoria/(?P<nombre>[\w\-]+)/$', views.categoria_detail),
+    url(r'^api/interes/(?P<nombre>[\w\-]+)/$', views.interes_detail),
+
+    #url(r'^api/cliente/solicitud/(?P<username>[\w\-]+)/$', views.solicitud_cliente),
+    url(r'^api/cliente/solicitud/$', views.solicitud_cliente),
+    url(r'^api/trabajador/solicitud/$', views.solicitud_trabajador),
+    url(r'^api/trabajador/interes/(?P<nombre>[\w\-]+)/$', views.solicitud_trabajador_interes),
+    url(r'^api/solicitud/$', views.create_solicitud),
+
 ]

@@ -30,7 +30,7 @@ class TrabajadorSerializer(serializers.HyperlinkedModelSerializer):
     intereses = InteresSerializer(many = True)
     class Meta:
         model = Trabajador
-        fields = ('username','password','email','first_name','intereses')#, 'photo', 'factura', 'cedula','valoracion','cantidad_votos')
+        fields = ('username','password','email','first_name','intereses','valoracion','cantidad_votos')#, 'photo', 'factura', 'cedula','valoracion','cantidad_votos')
 
 class ClienteSerializer(serializers.HyperlinkedModelSerializer):
     username = serializers.CharField( source='user.username', required = False )
@@ -42,10 +42,18 @@ class ClienteSerializer(serializers.HyperlinkedModelSerializer):
         model = Cliente
         fields = ('username','password','email','first_name','intereses')#, 'photo')
 
-class SolicitudSerializer(serializers.ModelSerializer):
-    id_trabajador = serializers.CharField( source='trabajador.id' )
-    id_cliente = serializers.CharField( source='cliente.id' )
-    nombre_interes = serializers.CharField( source='interes.nombre' )
-    class Meta:
-        model = Solicitud
-        fields = ('fecha', 'direccion', 'descripcion', 'estado', 'id_cliente', 'id_trabajador', 'nombre_interes')
+class SolicitudSerializer(serializers.Serializer):
+    fecha = serializers.DateTimeField()
+    direccion = serializers.CharField(max_length = 200)
+    descripcion = serializers.CharField(max_length = 500)
+    estado = serializers.CharField(max_length = 200)
+    cliente = ClienteSerializer()
+    trabajador = TrabajadorSerializer()
+    interes = InteresSerializer()
+
+class SolicitudDTOSerializer(serializers.Serializer):
+    fecha = serializers.DateTimeField()
+    direccion = serializers.CharField(max_length = 200)
+    descripcion = serializers.CharField(max_length = 500)
+    trabajadorusername = serializers.CharField(max_length = 500)
+    interesnombre = serializers.CharField(max_length = 500)
