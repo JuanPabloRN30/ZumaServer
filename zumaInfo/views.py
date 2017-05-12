@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -10,7 +12,7 @@ from zumaInfo.serializers import *
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from rest_framework import viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,authentication_classes,permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -230,6 +232,35 @@ def solicitud_trabajador_interes(request,nombre):
     return Response(serializer.data)
 
 @api_view(['POST'])
+@authentication_classes([])
+@permission_classes([])
+def tipo_usuario(request):
+    auth_Cliente = False;
+    auth_Trabajador = False;
+    try:
+        usuario = User.objects.get( username = request.data['username'] )
+    except User.DoesNotExist:
+        return JsonResponse({'tipo':'ninguno'});
+
+    try:
+        trabajador = Trabajador.objects.get( user__id = usuario.id )
+        print ("Encontre al trabajador")
+        print (trabajador.user.username)
+        auth_Trabajador = True;
+    except Trabajador.DoesNotExist:
+        print ("No existe")
+
+    try:
+        cliente = Cliente.objects.get( user__id = usuario.id )
+        auth_Cliente = True;
+    except Cliente.DoesNotExist:
+        print ("No existe")
+    if auth_Trabajador:
+        return JsonResponse({'tipo':'trabajador'});
+    else:
+        return JsonResponse({'tipo':'cliente'});
+
+@api_view(['POST'])
 def create_solicitud(request):
     serializer = SolicitudDTOSerializer(data = request.data)
     if request.method == 'GET':
@@ -239,14 +270,13 @@ def create_solicitud(request):
             trabajador_usuario = User.objects.filter(username = serializer.data['trabajadorusername']).first()
             trabajador = Trabajador.objects.filter(user__id__exact = trabajador_usuario.id).first()
             interes = Interes.objects.filter(nombre = serializer.data['interesnombre']).first()
-            fecha = serializer.data['fecha']
-            direccion = serializer.data['direccion']
-            descripcion = serializer.data['descripcion']
+            #fecha = serializer.data['fecha']
+            #direccion = serializer.data['direccion']
+            #descripcion = serializer.data['descripcion']
+            fecha = datetime.now();
             user = request.user
             cliente = Cliente.objects.filter(user__id__exact = user.id).first()
-            solicitud = Solicitud(fecha = fecha, direccion = direccion,
-                        descripcion = descripcion, cliente = cliente,
-                        trabajador = trabajador, interes = interes)
+            solicitud = Solicitud(fecha=fecha,cliente = cliente,trabajador = trabajador, interes = interes)
             solicitud.save()
             serializer = SolicitudSerializer(solicitud)
             return Response(serializer.data, status = status.HTTP_201_CREATED)

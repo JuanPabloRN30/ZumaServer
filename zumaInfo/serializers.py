@@ -52,8 +52,8 @@ class SolicitudSerializer(serializers.Serializer):
     interes = InteresSerializer()
 
 class SolicitudDTOSerializer(serializers.Serializer):
-    fecha = serializers.DateTimeField()
-    direccion = serializers.CharField(max_length = 200)
-    descripcion = serializers.CharField(max_length = 500)
+#    fecha = serializers.DateTimeField()
+#    direccion = serializers.CharField(max_length = 200)
+#    descripcion = serializers.CharField(max_length = 500)
     trabajadorusername = serializers.CharField(max_length = 500)
     interesnombre = serializers.CharField(max_length = 500)

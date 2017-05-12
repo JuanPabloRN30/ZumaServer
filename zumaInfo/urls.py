@@ -22,9 +22,10 @@ urlpatterns = [
     url(r'^api/interes/(?P<nombre>[\w\-]+)/$', views.interes_detail),
 
     #url(r'^api/cliente/solicitud/(?P<username>[\w\-]+)/$', views.solicitud_cliente),
+    url(r'^api/usuario/tipo/$', views.tipo_usuario),
     url(r'^api/cliente/solicitud/$', views.solicitud_cliente),
     url(r'^api/trabajador/solicitud/$', views.solicitud_trabajador),
-    url(r'^api/trabajador/interes/(?P<nombre>[\w\-]+)/$', views.solicitud_trabajador_interes),
+    url(r'^api/trabajador/interes/(?P<nombre>[\w\ ]+)/$', views.solicitud_trabajador_interes),
     url(r'^api/solicitud/$', views.create_solicitud),
 
 ]
