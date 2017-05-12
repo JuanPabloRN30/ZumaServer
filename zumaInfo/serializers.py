@@ -43,6 +43,7 @@ class ClienteSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('username','password','email','first_name','intereses')#, 'photo')
 
 class SolicitudSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     fecha = serializers.DateTimeField()
     direccion = serializers.CharField(max_length = 200)
     descripcion = serializers.CharField(max_length = 500)
@@ -55,5 +56,7 @@ class SolicitudDTOSerializer(serializers.Serializer):
 #    fecha = serializers.DateTimeField()
 #    direccion = serializers.CharField(max_length = 200)
 #    descripcion = serializers.CharField(max_length = 500)
+    id = serializers.IntegerField( required = False )
+    estado = serializers.CharField(max_length = 200, required = False)
     trabajadorusername = serializers.CharField(max_length = 500)
     interesnombre = serializers.CharField(max_length = 500)

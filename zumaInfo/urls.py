@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^api/trabajador/solicitud/$', views.solicitud_trabajador),
     url(r'^api/trabajador/interes/(?P<nombre>[\w\ ]+)/$', views.solicitud_trabajador_interes),
     url(r'^api/solicitud/$', views.create_solicitud),
+    url(r'^api/solicitud/edit/$', views.edit_solicitud),
 
 ]

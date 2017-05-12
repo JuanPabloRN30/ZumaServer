@@ -214,9 +214,16 @@ def solicitud_trabajador(request):
     print (user)
     trabajador = Trabajador.objects.filter(user__id__exact = user.id).first()
     solicitudes = Solicitud.objects.filter(trabajador = trabajador).all()
+    estado = request.query_params.get('estado',None)
+    if estado is not None:
+        solicitudes = Solicitud.objects.filter(estado = estado).all()
     mis_solicitudes = []
     for solicitud in solicitudes:
-        mis_solicitudes.append(solicitud)
+        if estado is None:
+            if solicitud.estado != "Aceptada":
+                mis_solicitudes.append(solicitud)
+        else:
+            mis_solicitudes.append(solicitud)
     serializer = SolicitudSerializer(mis_solicitudes, many = True)
     return Response(serializer.data)
 
@@ -285,4 +292,21 @@ def create_solicitud(request):
     except Interes.DoesNotExist:
         return Response(status = status.HTTP_400_BAD_REQUEST)
     except Trabajador.DoesNotExist:
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def edit_solicitud(request):
+    serializer = SolicitudDTOSerializer(data = request.data)
+    if request.method == 'GET':
+        return Response(status = status.HTTP_400_BAD_REQUEST)
+    try:
+        if serializer.is_valid():
+            solicitud = Solicitud.objects.get( pk = serializer.data['id'] );
+            solicitud.estado = serializer.data['estado'];
+            solicitud.save()
+            serializer = SolicitudSerializer(solicitud)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        else:
+            return Response(status = status.HTTP_400_BAD_REQUEST)
+    except Solicitud.DoesNotExist:
         return Response(status = status.HTTP_400_BAD_REQUEST)
