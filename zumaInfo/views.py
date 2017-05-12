@@ -198,12 +198,12 @@ def solicitud_cliente(request):
     print (user)
     cliente = Cliente.objects.filter(user__id__exact = user.id).first()
     solicitudes = Solicitud.objects.filter(cliente = cliente).all()
+    estado = request.query_params.get('estado',None)
+    if estado is not None:
+        listaSolicitudes = estado.split(',')
+        solicitudes = Solicitud.objects.filter(estado__in = listaSolicitudes).all()
     mis_solicitudes = []
     for solicitud in solicitudes:
-        # setting the worker to the work
-        if solicitud.trabajador is not None:
-            trabajador = Trabajador.objects.get(pk = solicitud.trabajador.id)
-            solicitud.trabajador = trabajador
         mis_solicitudes.append(solicitud)
     serializer = SolicitudSerializer(mis_solicitudes, many = True)
     return Response(serializer.data)
@@ -216,20 +216,16 @@ def solicitud_trabajador(request):
     solicitudes = Solicitud.objects.filter(trabajador = trabajador).all()
     estado = request.query_params.get('estado',None)
     if estado is not None:
-        solicitudes = Solicitud.objects.filter(estado = estado).all()
+        listaSolicitudes = estado.split(',')
+        solicitudes = Solicitud.objects.filter(estado__in = listaSolicitudes).all()
     mis_solicitudes = []
     for solicitud in solicitudes:
-        if estado is None:
-            if solicitud.estado != "Aceptada":
-                mis_solicitudes.append(solicitud)
-        else:
-            mis_solicitudes.append(solicitud)
+        mis_solicitudes.append(solicitud)
     serializer = SolicitudSerializer(mis_solicitudes, many = True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 def solicitud_trabajador_interes(request,nombre):
-    print ("El nombre del interes es: " + nombre)
     interes = Interes.objects.get( nombre = nombre )
     trabajadores = Trabajador.objects.filter(intereses = interes).all()
     mis_trabajadores = []
@@ -251,8 +247,6 @@ def tipo_usuario(request):
 
     try:
         trabajador = Trabajador.objects.get( user__id = usuario.id )
-        print ("Encontre al trabajador")
-        print (trabajador.user.username)
         auth_Trabajador = True;
     except Trabajador.DoesNotExist:
         print ("No existe")
