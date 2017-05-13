@@ -201,7 +201,7 @@ def solicitud_cliente(request):
     estado = request.query_params.get('estado',None)
     if estado is not None:
         listaSolicitudes = estado.split(',')
-        solicitudes = Solicitud.objects.filter(estado__in = listaSolicitudes).all()
+        solicitudes = solicitudes.filter(estado__in = listaSolicitudes).all()
     mis_solicitudes = []
     for solicitud in solicitudes:
         mis_solicitudes.append(solicitud)
@@ -217,7 +217,7 @@ def solicitud_trabajador(request):
     estado = request.query_params.get('estado',None)
     if estado is not None:
         listaSolicitudes = estado.split(',')
-        solicitudes = Solicitud.objects.filter(estado__in = listaSolicitudes).all()
+        solicitudes = solicitudes.filter(estado__in = listaSolicitudes).all()
     mis_solicitudes = []
     for solicitud in solicitudes:
         mis_solicitudes.append(solicitud)
@@ -264,6 +264,8 @@ def tipo_usuario(request):
 @api_view(['POST'])
 def create_solicitud(request):
     serializer = SolicitudDTOSerializer(data = request.data)
+    print ("Llego estos datos")
+    print (request.data)
     if request.method == 'GET':
         return Response(status = status.HTTP_400_BAD_REQUEST)
     try:
@@ -272,16 +274,18 @@ def create_solicitud(request):
             trabajador = Trabajador.objects.filter(user__id__exact = trabajador_usuario.id).first()
             interes = Interes.objects.filter(nombre = serializer.data['interesnombre']).first()
             #fecha = serializer.data['fecha']
-            #direccion = serializer.data['direccion']
+            direccion = serializer.data['direccion']
             #descripcion = serializer.data['descripcion']
             fecha = datetime.now();
             user = request.user
             cliente = Cliente.objects.filter(user__id__exact = user.id).first()
-            solicitud = Solicitud(fecha=fecha,cliente = cliente,trabajador = trabajador, interes = interes)
+            solicitud = Solicitud(fecha=fecha,cliente = cliente,trabajador = trabajador, interes = interes,
+                                direccion = direccion)
             solicitud.save()
             serializer = SolicitudSerializer(solicitud)
             return Response(serializer.data, status = status.HTTP_201_CREATED)
         else:
+            print ("No es valido")
             return Response(status = status.HTTP_400_BAD_REQUEST)
     except Interes.DoesNotExist:
         return Response(status = status.HTTP_400_BAD_REQUEST)

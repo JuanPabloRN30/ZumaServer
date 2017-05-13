@@ -21,8 +21,8 @@ class Trabajador(models.Model):
     photo = models.CharField(max_length=100, null = True)
     factura = models.CharField(max_length=100, null = True)
     cedula = models.CharField(max_length=100, null = True, unique = True)
-    valoracion = models.IntegerField(default=0)
-    cantidad_votos = models.IntegerField(default=0)
+    valoracion = models.IntegerField(default=5)
+    cantidad_votos = models.IntegerField(default=1)
     estado = models.BooleanField( default = False )
     intereses = models.ManyToManyField( Interes )
     def __str__(self):
