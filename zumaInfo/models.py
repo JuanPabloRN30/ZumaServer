@@ -25,6 +25,7 @@ class Trabajador(models.Model):
     cantidad_votos = models.IntegerField(default=1)
     estado = models.BooleanField( default = False )
     intereses = models.ManyToManyField( Interes )
+    descripcion = models.CharField( max_length=1000, null = True )
     def __str__(self):
         return self.user.username
 

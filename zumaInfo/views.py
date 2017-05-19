@@ -273,10 +273,9 @@ def create_solicitud(request):
             trabajador_usuario = User.objects.filter(username = serializer.data['trabajadorusername']).first()
             trabajador = Trabajador.objects.filter(user__id__exact = trabajador_usuario.id).first()
             interes = Interes.objects.filter(nombre = serializer.data['interesnombre']).first()
-            #fecha = serializer.data['fecha']
+            fecha = serializer.data['fecha']
             direccion = serializer.data['direccion']
             #descripcion = serializer.data['descripcion']
-            fecha = datetime.now();
             user = request.user
             cliente = Cliente.objects.filter(user__id__exact = user.id).first()
             solicitud = Solicitud(fecha=fecha,cliente = cliente,trabajador = trabajador, interes = interes,

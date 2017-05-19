@@ -53,7 +53,7 @@ class SolicitudSerializer(serializers.Serializer):
     interes = InteresSerializer()
 
 class SolicitudDTOSerializer(serializers.Serializer):
-#    fecha = serializers.DateTimeField()
+    fecha = serializers.DateTimeField(required = False)
     direccion = serializers.CharField(max_length = 200)
 #    descripcion = serializers.CharField(max_length = 500)
     id = serializers.IntegerField( required = False )
